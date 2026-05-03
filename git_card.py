@@ -1,6 +1,9 @@
 import requests
 from datetime import datetime, timedelta
 import os
+from dotenv import load_dotenv
+
+load_dotenv()  # loads variables from .env into environment
 
 USERNAME = os.getenv("GITHUB_USERNAME")
 
