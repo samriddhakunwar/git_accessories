@@ -29,13 +29,19 @@ headers = {"Authorization": f"token {TOKEN}"} if TOKEN else {}
 BAR_WIDTH = 25
 
 
-def api_get(url):
-    """GET a GitHub API URL. Returns parsed JSON, or None on 404/409 (missing/empty repo). Exits on rate limit/network errors."""
+def api_request(url, payload=None):
+    """GET a GitHub API URL (or POST `payload` as JSON). Returns parsed JSON, or None on 404/409 (missing/empty repo).
+    Exits on bad token, rate limit and network errors."""
     try:
-        res = requests.get(url, headers=headers, timeout=15)
+        if payload is None:
+            res = requests.get(url, headers=headers, timeout=15)
+        else:
+            res = requests.post(url, headers=headers, json=payload, timeout=30)
     except requests.RequestException as e:
         sys.exit(f"❌ Network error: {e}")
 
+    if res.status_code == 401:
+        sys.exit("❌ GitHub rejected GITHUB_TOKEN (401): it is invalid or expired. Generate a new one and update .env.")
     if res.status_code in (403, 429) or (res.headers.get("X-RateLimit-Remaining") == "0" and not res.ok):
         reset = res.headers.get("X-RateLimit-Reset")
         when = datetime.fromtimestamp(int(reset)).strftime("%Y-%m-%d %H:%M:%S") if reset else "unknown"
@@ -51,7 +57,7 @@ def get_repos(username, include_forks=False):
     repos = []
     page = 1
     while True:
-        data = api_get(f"https://api.github.com/users/{username}/repos?per_page=100&page={page}")
+        data = api_request(f"https://api.github.com/users/{username}/repos?per_page=100&page={page}")
         if data is None:
             sys.exit(f"❌ GitHub user '{username}' not found.")
         if not data:
@@ -64,7 +70,7 @@ def get_repos(username, include_forks=False):
 
 def get_languages(owner, repo_name):
     # Empty repos return {}; a vanished repo returns 404 -> treat as no languages
-    return api_get(f"https://api.github.com/repos/{owner}/{repo_name}/languages") or {}
+    return api_request(f"https://api.github.com/repos/{owner}/{repo_name}/languages") or {}
 
 
 def render_chart(totals, top):

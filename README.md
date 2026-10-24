@@ -81,6 +81,37 @@ Each column is one hour; shades (` ░▒▓█`) are scaled to your busiest cel
 | `--months N` | Lookback window in months (default: 12). |
 | `--include-forks` | Include forked repositories (skipped by default). |
 
+### `git_streak.py` — Contribution Streak Tracker
+
+Fetches your GitHub **contribution calendar** via the GraphQL API and shows your **current streak**, **longest streak**, total contributions, active days, best day, and a strip of the last 30 days.
+
+> 🔑 **This tool requires a token.** GitHub's GraphQL API does not accept unauthenticated requests. A classic token with the `read:user` scope is enough.
+
+If you haven't contributed yet today, your streak isn't broken: it is counted up to yesterday and marked "(today not counted yet)".
+
+**Example output:**
+```
+🔥 Contribution streaks for samriddhakunwar
+
+Current streak:   12 days  (Oct 13 → Oct 24)
+Longest streak:   27 days  (Mar 02 → Mar 28, 2026)
+Total (1 year):   1,284 contributions
+Active days:      231 / 365  (63%)
+Best day:         Jun 14, 2026 — 41 contributions
+
+Last 30 days:
+░▒▓█▓▒ ░▒▓▓█▒░░▒▓▓█▓▒░▒▓█▓▒░
+```
+
+Shades (` ░▒▓█`) in the 30-day strip are scaled to your busiest day in that window.
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--years N` | Years to look back (default: 1). Makes one GraphQL query per year. |
+| `--tz NAME` | IANA timezone used to decide "today", e.g. `Asia/Kathmandu` (default: system timezone). |
+
 ---
 
 ## 🚀 Getting Started
@@ -107,9 +138,11 @@ GITHUB_USERNAME="your_github_username"
 GITHUB_TOKEN="ghp_your_personal_access_token"
 ```
 
-> **How to get a token:** GitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic) → check `repo` scope.
+> **How to get a token:** GitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic) → check `repo` scope (`git_streak.py` additionally needs `read:user`).
 >
 > The token is optional but **strongly recommended** — without it, GitHub's API rate limit is only 60 requests/hour, which won't be enough for users with many repositories.
+>
+> **`git_streak.py` requires the token** (GitHub's GraphQL API rejects unauthenticated requests) and needs the `read:user` scope.
 
 ### 4. Run
 
@@ -117,6 +150,7 @@ GITHUB_TOKEN="ghp_your_personal_access_token"
 python git_card.py
 python git_langs.py                    # or: --top 5 --include-forks
 python git_hours.py                    # or: --tz Asia/Kathmandu --months 6
+python git_streak.py                   # or: --years 3 --tz Asia/Kathmandu (requires token)
 ```
 
 ---
@@ -135,6 +169,7 @@ git_accessories/
 ├── git_card.py      # Counts total commits in the last 12 months
 ├── git_langs.py     # Language breakdown across your repos
 ├── git_hours.py     # Weekday x hour commit heatmap
+├── git_streak.py    # Current/longest contribution streaks
 ├── .env             # Local secrets (gitignored)
 ├── .gitignore
 └── README.md

@@ -20,7 +20,7 @@ from collections import Counter
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from git_langs import TOKEN, USERNAME, api_get, get_repos
+from git_langs import TOKEN, USERNAME, api_request, get_repos
 
 DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 FULL_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -35,7 +35,7 @@ def get_commit_times(owner, repo_name, username, since):
     while True:
         url = (f"https://api.github.com/repos/{owner}/{repo_name}/commits"
                f"?author={username}&since={since}&per_page=100&page={page}")
-        commits = api_get(url)  # None on 409 (empty repo) or 404
+        commits = api_request(url)  # None on 409 (empty repo) or 404
         if not commits:
             break
         for c in commits:
