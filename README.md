@@ -17,6 +17,32 @@ Checking hospital-management...
 🔥 Total commits in last 12 months: 342
 ```
 
+### `git_langs.py` — Language Breakdown
+
+Fetches all your public GitHub repositories (forks skipped by default), sums the **bytes of code per language** across them, and prints a sorted bar chart of your top languages.
+
+**Example output:**
+```
+Checking portfolio...
+Checking git_accessories...
+Checking hospital-management...
+
+📊 Language breakdown across 12 repos:
+
+Python       ████████████░░░░░░░░░░░░░  48.2%
+JavaScript   █████░░░░░░░░░░░░░░░░░░░░  21.7%
+HTML         ███░░░░░░░░░░░░░░░░░░░░░░  13.1%
+CSS          ██░░░░░░░░░░░░░░░░░░░░░░░   9.4%
+Other        ██░░░░░░░░░░░░░░░░░░░░░░░   7.6%
+```
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--top N` | Number of languages to show (default: 8). The rest are grouped into "Other". |
+| `--include-forks` | Include forked repositories (skipped by default). |
+
 ---
 
 ## 🚀 Getting Started
@@ -51,6 +77,7 @@ GITHUB_TOKEN="ghp_your_personal_access_token"
 
 ```bash
 python git_card.py
+python git_langs.py                    # or: --top 5 --include-forks
 ```
 
 ---
@@ -67,6 +94,7 @@ python git_card.py
 ```
 git_accessories/
 ├── git_card.py      # Counts total commits in the last 12 months
+├── git_langs.py     # Language breakdown across your repos
 ├── .env             # Local secrets (gitignored)
 ├── .gitignore
 └── README.md
