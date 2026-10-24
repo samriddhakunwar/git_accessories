@@ -43,6 +43,44 @@ Other        ██░░░░░░░░░░░░░░░░░░░░�
 | `--top N` | Number of languages to show (default: 8). The rest are grouped into "Other". |
 | `--include-forks` | Include forked repositories (skipped by default). |
 
+### `git_hours.py` — Coding Hours Heatmap
+
+Fetches every commit you authored in your public repositories over the last 12 months, converts the timestamps to **your timezone**, and prints a **weekday × hour heatmap** of when you code, plus a short summary.
+
+> This tool makes one request per 100 commits per repo — a `GITHUB_TOKEN` is strongly recommended.
+
+**Example output:**
+```
+Checking portfolio...
+Checking git_accessories...
+
+🕒 Commit heatmap (last 12 months, Asia/Kathmandu)
+
+      00 03 06 09 12 15 18 21
+Mon   ░▓░░  ░    ░░░ ░░▓▒█▓▓▒▒
+Tue   ▓▒░░░░       ▒░▒░▒██▓▒░▒
+Wed    ░     ░ ░░░░▒░░▓░░▒▒░▒▓
+Thu   ░█░        ░░░░░░▒▒░▒▓▓░
+Fri   ▒░░         ░ ░▒█▒▓█▒▓▓▒
+Sat   ░░░░░      ░░▒░▒▒▓▓▒▓▒░░
+Sun   ▒▒░         ░▓▓▒▒▓▓░▓░░░
+
+📈 342 commits analyzed
+⏰ Peak hour: 20:00–21:00 (33 commits)
+📅 Busiest day: Monday (56 commits)
+🦉 Night owl score: 28% of commits between 22:00 and 04:00
+```
+
+Each column is one hour; shades (` ░▒▓█`) are scaled to your busiest cell.
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--tz NAME` | IANA timezone, e.g. `Asia/Kathmandu` (default: system timezone). On Windows, run `pip install tzdata` if valid names aren't recognized. |
+| `--months N` | Lookback window in months (default: 12). |
+| `--include-forks` | Include forked repositories (skipped by default). |
+
 ---
 
 ## 🚀 Getting Started
@@ -78,6 +116,7 @@ GITHUB_TOKEN="ghp_your_personal_access_token"
 ```bash
 python git_card.py
 python git_langs.py                    # or: --top 5 --include-forks
+python git_hours.py                    # or: --tz Asia/Kathmandu --months 6
 ```
 
 ---
@@ -95,6 +134,7 @@ python git_langs.py                    # or: --top 5 --include-forks
 git_accessories/
 ├── git_card.py      # Counts total commits in the last 12 months
 ├── git_langs.py     # Language breakdown across your repos
+├── git_hours.py     # Weekday x hour commit heatmap
 ├── .env             # Local secrets (gitignored)
 ├── .gitignore
 └── README.md

@@ -30,7 +30,7 @@ BAR_WIDTH = 25
 
 
 def api_get(url):
-    """GET a GitHub API URL. Returns parsed JSON, or None on 404. Exits on rate limit/network errors."""
+    """GET a GitHub API URL. Returns parsed JSON, or None on 404/409 (missing/empty repo). Exits on rate limit/network errors."""
     try:
         res = requests.get(url, headers=headers, timeout=15)
     except requests.RequestException as e:
@@ -40,7 +40,7 @@ def api_get(url):
         reset = res.headers.get("X-RateLimit-Reset")
         when = datetime.fromtimestamp(int(reset)).strftime("%Y-%m-%d %H:%M:%S") if reset else "unknown"
         sys.exit(f"⏳ GitHub API rate limit hit. Resets at {when} (local time).")
-    if res.status_code == 404:
+    if res.status_code in (404, 409):
         return None
     if not res.ok:
         sys.exit(f"❌ GitHub API error {res.status_code}: {res.text[:200]}")
