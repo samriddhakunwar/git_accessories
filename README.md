@@ -112,6 +112,56 @@ Shades (` ░▒▓█`) in the 30-day strip are scaled to your busiest day in t
 | `--years N` | Years to look back (default: 1). Makes one GraphQL query per year. |
 | `--tz NAME` | IANA timezone used to decide "today", e.g. `Asia/Kathmandu` (default: system timezone). |
 
+### `git_audit.py` — Repo Health Audit
+
+Checks each of your public repositories for common gaps and gives it a **health score out of 100**. Forks and archived repos are skipped by default. **Read-only:** it never modifies a repo.
+
+| Check | Penalty |
+|-------|---------|
+| Empty repo (size 0) | −50 |
+| No README | −25 |
+| No description | −20 |
+| No license | −15 |
+| Stale (not pushed in 6+ months) | −15 |
+| No topics | −10 |
+| No homepage (only for website-like repos: HTML/CSS/JS/TS, or "portfolio"/"site"/"web" in the name) | −10 |
+
+The weights live in the `WEIGHTS` dict at the top of `git_audit.py`, so you can tweak them. If the README check fails for a reason other than "not found", it shows as "README unknown" and costs no points.
+
+**Example output:**
+```
+Checking old-calculator...
+Checking hospital-management...
+Checking portfolio...
+Checking git_accessories...
+
+🩺 Repo health audit for samriddhakunwar (4 repos)
+
+Score  Repo                   Issues
+ 25    old-calculator         stale (2y), no README, no description, no license
+ 75    hospital-management    no license, no topics
+ 80    portfolio              no topics, no homepage
+100    git_accessories        ✓ all good
+
+📋 Summary
+   Average health:   70 / 100
+   Missing README:   1 repo
+   Missing license:  2 repos
+   Stale (>6 mo):    1 repo
+
+💡 Quick win: add a license to 2 repos for +15 each
+```
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--stale-months N` | Flag repos not pushed in N months (default: 6). |
+| `--min-score N` | Only show repos scoring below N. |
+| `--json` | Print full results as JSON instead of the table (progress lines go to stderr, so stdout stays pipeable). |
+| `--include-forks` | Include forked repositories (skipped by default). |
+| `--include-archived` | Include archived repositories (skipped by default). |
+
 ---
 
 ## 🚀 Getting Started
@@ -151,6 +201,7 @@ python git_card.py
 python git_langs.py                    # or: --top 5 --include-forks
 python git_hours.py                    # or: --tz Asia/Kathmandu --months 6
 python git_streak.py                   # or: --years 3 --tz Asia/Kathmandu (requires token)
+python git_audit.py                    # or: --min-score 80, --json > audit.json
 ```
 
 ---
@@ -170,6 +221,7 @@ git_accessories/
 ├── git_langs.py     # Language breakdown across your repos
 ├── git_hours.py     # Weekday x hour commit heatmap
 ├── git_streak.py    # Current/longest contribution streaks
+├── git_audit.py     # Repo health scores and quick wins
 ├── .env             # Local secrets (gitignored)
 ├── .gitignore
 └── README.md

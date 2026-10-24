@@ -29,6 +29,16 @@ headers = {"Authorization": f"token {TOKEN}"} if TOKEN else {}
 BAR_WIDTH = 25
 
 
+def exit_on_auth_or_rate_limit(res):
+    """Exit with a clear message on a rejected token (401) or a rate limit (prints reset time in local time)."""
+    if res.status_code == 401:
+        sys.exit("❌ GitHub rejected GITHUB_TOKEN (401): it is invalid or expired. Generate a new one and update .env.")
+    if res.status_code in (403, 429) or (res.headers.get("X-RateLimit-Remaining") == "0" and not res.ok):
+        reset = res.headers.get("X-RateLimit-Reset")
+        when = datetime.fromtimestamp(int(reset)).strftime("%Y-%m-%d %H:%M:%S") if reset else "unknown"
+        sys.exit(f"⏳ GitHub API rate limit hit. Resets at {when} (local time).")
+
+
 def api_request(url, payload=None):
     """GET a GitHub API URL (or POST `payload` as JSON). Returns parsed JSON, or None on 404/409 (missing/empty repo).
     Exits on bad token, rate limit and network errors."""
@@ -40,12 +50,7 @@ def api_request(url, payload=None):
     except requests.RequestException as e:
         sys.exit(f"❌ Network error: {e}")
 
-    if res.status_code == 401:
-        sys.exit("❌ GitHub rejected GITHUB_TOKEN (401): it is invalid or expired. Generate a new one and update .env.")
-    if res.status_code in (403, 429) or (res.headers.get("X-RateLimit-Remaining") == "0" and not res.ok):
-        reset = res.headers.get("X-RateLimit-Reset")
-        when = datetime.fromtimestamp(int(reset)).strftime("%Y-%m-%d %H:%M:%S") if reset else "unknown"
-        sys.exit(f"⏳ GitHub API rate limit hit. Resets at {when} (local time).")
+    exit_on_auth_or_rate_limit(res)
     if res.status_code in (404, 409):
         return None
     if not res.ok:
