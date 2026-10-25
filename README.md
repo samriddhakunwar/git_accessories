@@ -197,6 +197,61 @@ Add this to your profile README:
 
 > 🔑 **Contributions and streak in Actions:** the built-in Actions token can't read your GraphQL contribution calendar. To include them, create a personal access token (classic, `read:user` scope) and add it as a repository secret named **`GH_PAT`** (repo → Settings → Secrets and variables → Actions → New repository secret). The workflow automatically uses `GH_PAT` as `GITHUB_TOKEN` when it exists.
 
+### `git_followers.py` — Follower Tracker
+
+Fetches your **followers** and **following** lists, compares them with a snapshot saved on the previous run, and reports **new followers**, **unfollowers**, people you follow who **don't follow you back**, and **fans** you don't follow back. Each run is also appended to a history log, so you can see your follower growth over time.
+
+**Read-only:** it never follows or unfollows anyone.
+
+**Example output:**
+```
+👥 Follower report for samriddhakunwar
+   Last checked: Oct 18, 2026 (7 days ago)
+
+Followers: 128 (+4)   Following: 96
+
+🎉 New followers (5)
+   + alice-dev
+   + bob123
+   ...
+
+👋 Unfollowed you (1)
+   - charlie99
+
+🔁 You follow, they don't follow back (12)
+   dave-codes, eve.js, ...and 2 more  (use --show-all to list everyone)
+
+💜 Fans you don't follow back (44)
+   ...
+```
+
+On the first run there's nothing to compare yet, so it prints your current counts, saves a snapshot, and shows changes from the next run onward.
+
+**History (`--history`):**
+```
+📈 Follower history for samriddhakunwar (last 3 runs)
+
+Date           Followers  Trend  Following  +New  -Lost
+Oct 11, 2026         120      —         95     0      0
+Oct 18, 2026         124     +4         96     5      1
+Oct 25, 2026         128     +4         96     5      1
+```
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--snapshot PATH` | Snapshot file (default: `.followers_snapshot.json`). |
+| `--history` | Print the last 10 runs with the follower trend, then exit (no API calls). |
+| `--show-all` | List every name in every section (default: first 10, then "...and N more"). |
+| `--json` | Print the full report as JSON (warnings go to stderr, so stdout stays pipeable). |
+
+**Local files:** the snapshot (`.followers_snapshot.json`) and the history log (`.followers_history.json`) are written to the current directory. They only hold public usernames, but they're personal data about other people, so both are in `.gitignore`. The snapshot is written atomically, and it's never overwritten with partial data: if a fetch fails partway, the run exits with an error so the next run can't report false unfollows. If the snapshot is corrupted or belongs to a different user, you get a warning and the run is treated as a first run.
+
+> ⚠️ **Known limitation:** the snapshot stores only usernames, so a user who renames their account shows up as one unfollow plus one new follower.
+
+> 💡 **Tip:** it works best on a schedule (e.g. weekly), so each report covers a meaningful window and `--history` shows a steady trend.
+
 ---
 
 ## 🚀 Getting Started
@@ -238,6 +293,7 @@ python git_hours.py                    # or: --tz Asia/Kathmandu --months 6
 python git_streak.py                   # or: --years 3 --tz Asia/Kathmandu (requires token)
 python git_audit.py                    # or: --min-score 80, --json > audit.json
 python git_banner.py                   # or: --theme light --output card.svg --no-animation
+python git_followers.py                # or: --show-all, --history, --json
 ```
 
 ---
@@ -260,6 +316,8 @@ git_accessories/
 ├── git_audit.py     # Repo health scores and quick wins
 ├── git_banner.py    # Profile stats SVG card generator
 ├── test_git_banner.py  # Layout self-check for git_banner.py (fake data)
+├── git_followers.py # Follower tracker (new followers, unfollowers, fans)
+├── test_git_followers.py  # Checks for git_followers.diff_snapshots
 ├── banner.svg       # Generated stats card (updated by the workflow)
 ├── .github/
 │   └── workflows/
