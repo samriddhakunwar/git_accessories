@@ -19,6 +19,7 @@ import argparse
 import sys
 from collections import Counter
 from datetime import datetime, timedelta
+from pathlib import Path
 from xml.sax.saxutils import escape
 
 from git_langs import TOKEN, USERNAME, api_request, get_languages, get_repos
@@ -109,7 +110,7 @@ def build_svg(stats, theme="dark", animate=True):
         items.append(("streak", "Current streak", f"{stats['streak']} day{'' if stats['streak'] == 1 else 's'}"))
     if stats.get("top_repo"):
         name, stars = stats["top_repo"]
-        name = name if len(name) <= 20 else name[:19] + "…"
+        name = name if len(name) <= 16 else name[:15] + "…"
         items.append(("top_repo", f"Top: {name}", f"★ {compact(stars)}"))
 
     col_w = (WIDTH - 2 * PAD) / 2
@@ -201,7 +202,8 @@ def main():
     with open(args.output, "w", encoding="utf-8") as f:
         f.write(build_svg(stats, args.theme, animate=not args.no_animation))
     print(f"\n✅ Saved {args.output} ({args.theme} theme)\n")
-    print(f"Add this to your profile README:\n![My GitHub stats](./{args.output})")
+    path = Path(args.output).as_posix()
+    print(f"Add this to your profile README:\n![My GitHub stats]({path if Path(path).is_absolute() else './' + path})")
 
 
 if __name__ == "__main__":

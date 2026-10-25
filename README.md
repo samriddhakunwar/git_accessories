@@ -162,6 +162,41 @@ Score  Repo                   Issues
 | `--include-forks` | Include forked repositories (skipped by default). |
 | `--include-archived` | Include archived repositories (skipped by default). |
 
+### `git_banner.py` — Profile Stats SVG Card
+
+Generates a self-contained **SVG stats card** for your profile README: total stars, total forks, public repos (non-fork), followers, most starred repo, and a stacked bar of your **top 5 languages**. With a `GITHUB_TOKEN`, it also shows **contributions in the last year** and your **current streak**. Without a token, those two are left off and a note is printed.
+
+The card uses only inline shapes and a system font stack (no external fonts, scripts or images, which GitHub strips), plus a subtle CSS fade-in. Any stat that fails to fetch is left off the card instead of crashing the run.
+
+**Example output:**
+```
+Checking portfolio...
+Checking git_accessories...
+Checking hospital-management...
+
+✅ Saved banner.svg (dark theme)
+
+Add this to your profile README:
+![My GitHub stats](./banner.svg)
+```
+
+**Embed it:**
+```markdown
+![My GitHub stats](./banner.svg)
+```
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--output PATH` | Output file (default: `banner.svg`). |
+| `--theme dark\|light` | Color theme (default: `dark`, matching GitHub dark). Colors live in the `THEMES` dict at the top of the file. |
+| `--no-animation` | Disable the fade-in animation. |
+
+**Auto-update with GitHub Actions:** `.github/workflows/update-banner.yml` regenerates `banner.svg` daily (or on demand from the Actions tab via *Run workflow*) and commits it only if it changed. It uses the built-in `GITHUB_TOKEN` with `contents: write`, so no setup is needed for the basic card. For `./banner.svg` to resolve in your profile README, the script and workflow must live in your profile repo (`<username>/<username>`). Otherwise, embed the file's raw URL.
+
+> 🔑 **Contributions and streak in Actions:** the built-in Actions token can't read your GraphQL contribution calendar. To include them, create a personal access token (classic, `read:user` scope) and add it as a repository secret named **`GH_PAT`** (repo → Settings → Secrets and variables → Actions → New repository secret). The workflow automatically uses `GH_PAT` as `GITHUB_TOKEN` when it exists.
+
 ---
 
 ## 🚀 Getting Started
@@ -202,6 +237,7 @@ python git_langs.py                    # or: --top 5 --include-forks
 python git_hours.py                    # or: --tz Asia/Kathmandu --months 6
 python git_streak.py                   # or: --years 3 --tz Asia/Kathmandu (requires token)
 python git_audit.py                    # or: --min-score 80, --json > audit.json
+python git_banner.py                   # or: --theme light --output card.svg --no-animation
 ```
 
 ---
@@ -222,6 +258,12 @@ git_accessories/
 ├── git_hours.py     # Weekday x hour commit heatmap
 ├── git_streak.py    # Current/longest contribution streaks
 ├── git_audit.py     # Repo health scores and quick wins
+├── git_banner.py    # Profile stats SVG card generator
+├── test_git_banner.py  # Layout self-check for git_banner.py (fake data)
+├── banner.svg       # Generated stats card (updated by the workflow)
+├── .github/
+│   └── workflows/
+│       └── update-banner.yml  # Daily banner.svg regeneration
 ├── .env             # Local secrets (gitignored)
 ├── .gitignore
 └── README.md
