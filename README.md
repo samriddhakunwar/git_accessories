@@ -294,6 +294,33 @@ Lists every **open issue and pull request** across the repositories you own, **o
 
 > GitHub search returns at most 1,000 results, so the inbox is capped there. Without a token, search is limited to 10 requests/minute.
 
+### `git_releases.py` — Unreleased Changes
+
+For each of your public repositories that has a release, shows the **latest release**, how long ago it was published and **how many commits the default branch is ahead of it**, sorted so the repos most overdue for a release come first. Forks and empty repos are skipped. **Read-only.**
+
+**Example output:**
+```
+Checking portfolio...
+Checking git_accessories...
+
+🏷️  Releases for samriddhakunwar (2 of 12 repos have one)
+
+Repo             Latest  Released  Unreleased
+git_accessories  v1.2     45d ago  14
+portfolio        v2.0      9d ago  ✓ up to date
+
+💡 1 repo with unreleased commits — git_accessories leads with 14.
+```
+
+"Latest" is GitHub's latest release (drafts and pre-releases are ignored). `?` means the release's tag couldn't be compared with the default branch (e.g. the tag was deleted).
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--include-forks` | Include forked repositories (skipped by default). |
+| `--json` | Print results as JSON (progress lines go to stderr, so stdout stays pipeable). |
+
 ---
 
 ## 🚀 Getting Started
@@ -337,6 +364,7 @@ python git_audit.py                    # or: --min-score 80, --json > audit.json
 python git_banner.py                   # or: --theme light --output card.svg --no-animation
 python git_followers.py                # or: --show-all, --history, --json
 python git_inbox.py                    # or: --prs, --min-age 30, --json
+python git_releases.py                 # or: --include-forks, --json
 ```
 
 ---
@@ -363,6 +391,7 @@ git_accessories/
 ├── test_git_followers.py  # Checks for git_followers.diff_snapshots
 ├── git_inbox.py     # Open issues and PRs across your repos
 ├── test_git_inbox.py  # Checks for git_inbox.simplify
+├── git_releases.py  # Commits since each repo's latest release
 ├── banner.svg       # Generated stats card (updated by the workflow)
 ├── .github/
 │   └── workflows/
