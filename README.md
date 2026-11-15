@@ -6,7 +6,7 @@ A collection of lightweight Python utilities for fetching and analyzing your Git
 
 ### `git_card.py` — Commit Counter
 
-Fetches all your public GitHub repositories and counts your **total commits over the last 12 months** across all of them.
+Fetches all your public GitHub repositories (forks skipped by default) and counts the **commits you authored over the last 12 months** across all of them, plus your most active repos.
 
 **Example output:**
 ```
@@ -15,7 +15,20 @@ Checking git_accessories...
 Checking hospital-management...
 
 🔥 Total commits in last 12 months: 342
+
+🏆 Most active repos:
+   git_accessories        181  (53%)
+   portfolio              102  (30%)
+   hospital-management     59  (17%)
 ```
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--months N` | Lookback window in months (default: 12). |
+| `--top N` | Repos to show in the breakdown (default: 5, `0` hides it). |
+| `--include-forks` | Include forked repositories (skipped by default). |
 
 ### `git_langs.py` — Language Breakdown
 
@@ -287,7 +300,7 @@ GITHUB_TOKEN="ghp_your_personal_access_token"
 ### 4. Run
 
 ```bash
-python git_card.py
+python git_card.py                     # or: --months 3 --top 10
 python git_langs.py                    # or: --top 5 --include-forks
 python git_hours.py                    # or: --tz Asia/Kathmandu --months 6
 python git_streak.py                   # or: --years 3 --tz Asia/Kathmandu (requires token)
