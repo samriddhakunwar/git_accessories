@@ -9,8 +9,10 @@ Usage:
     python git_langs.py                  # top 8 languages, forks skipped
     python git_langs.py --top 5          # show top 5, group the rest as "Other"
     python git_langs.py --include-forks  # also count forked repos
+    python git_langs.py --json           # bytes and percent per language, for piping
 """
 import argparse
+import json
 import os
 import sys
 from collections import Counter
@@ -98,22 +100,31 @@ def main():
     parser = argparse.ArgumentParser(description="Show language breakdown across your public GitHub repos.")
     parser.add_argument("--top", type=int, default=8, help="number of languages to show (default: 8)")
     parser.add_argument("--include-forks", action="store_true", help="include forked repos")
+    parser.add_argument("--json", action="store_true", help="print every language as JSON instead of a chart")
     args = parser.parse_args()
+    log = sys.stderr if args.json else sys.stdout  # keep stdout pure JSON when piping
 
     if not USERNAME:
         sys.exit("❌ GITHUB_USERNAME is not set. Add it to your .env file.")
     if args.top < 1:
         sys.exit("❌ --top must be at least 1.")
     if not TOKEN:
-        print("⚠️  No GITHUB_TOKEN set — unauthenticated requests are limited to 60/hour.\n")
+        print("⚠️  No GITHUB_TOKEN set — unauthenticated requests are limited to 60/hour.\n", file=log)
 
     repos = get_repos(USERNAME, args.include_forks)
     totals = Counter()
 
     for repo in repos:
         repo_name = repo["name"]
-        print(f"Checking {repo_name}...")
+        print(f"Checking {repo_name}...", file=log)
         totals.update(get_languages(repo["owner"]["login"], repo_name))
+
+    if args.json:
+        grand_total = sum(totals.values())
+        print(json.dumps({"repos": len(repos), "languages": [
+            {"language": lang, "bytes": n, "percent": round(n / grand_total * 100, 2)}
+            for lang, n in totals.most_common()]}, indent=2))
+        return
 
     if not totals:
         print(f"\nNo language data found across {len(repos)} repos.")

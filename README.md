@@ -55,6 +55,7 @@ Other        ██░░░░░░░░░░░░░░░░░░░░�
 |------|-------------|
 | `--top N` | Number of languages to show (default: 8). The rest are grouped into "Other". |
 | `--include-forks` | Include forked repositories (skipped by default). |
+| `--json` | Print every language with its bytes and percent as JSON (progress lines go to stderr, so stdout stays pipeable). |
 
 ### `git_hours.py` — Coding Hours Heatmap
 
@@ -301,7 +302,7 @@ GITHUB_TOKEN="ghp_your_personal_access_token"
 
 ```bash
 python git_card.py                     # or: --months 3 --top 10
-python git_langs.py                    # or: --top 5 --include-forks
+python git_langs.py                    # or: --top 5 --include-forks, --json
 python git_hours.py                    # or: --tz Asia/Kathmandu --months 6
 python git_streak.py                   # or: --years 3 --tz Asia/Kathmandu (requires token)
 python git_audit.py                    # or: --min-score 80, --json > audit.json
