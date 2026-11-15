@@ -266,6 +266,34 @@ Oct 25, 2026         128     +4         96     5      1
 
 > 💡 **Tip:** it works best on a schedule (e.g. weekly), so each report covers a meaningful window and `--history` shows a steady trend.
 
+### `git_inbox.py` — Open Issues & PRs Inbox
+
+Lists every **open issue and pull request** across the repositories you own, **oldest first**, with how long each has been open. It uses GitHub's search API, so it's one request per 100 items instead of one per repo. **Read-only.**
+
+**Example output:**
+```
+📬 Open items in samriddhakunwar's repos
+
+🔀 Pull requests (1)
+     29d  portfolio#7         Fix mobile nav  (@alice-dev)
+
+🐛 Issues (2)
+     64d  git_accessories#3   Support GitLab  (@bob123)
+      3d  portfolio#9         Typo on About page  (@charlie99)
+
+⏳ Oldest: git_accessories#3, open 64 days — https://github.com/samriddhakunwar/git_accessories/issues/3
+```
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--prs` / `--issues` | Show only pull requests or only issues. |
+| `--min-age N` | Only show items open for at least N days. |
+| `--json` | Print the list as JSON (warnings go to stderr, so stdout stays pipeable). |
+
+> GitHub search returns at most 1,000 results, so the inbox is capped there. Without a token, search is limited to 10 requests/minute.
+
 ---
 
 ## 🚀 Getting Started
@@ -308,6 +336,7 @@ python git_streak.py                   # or: --years 3 --tz Asia/Kathmandu (requ
 python git_audit.py                    # or: --min-score 80, --json > audit.json
 python git_banner.py                   # or: --theme light --output card.svg --no-animation
 python git_followers.py                # or: --show-all, --history, --json
+python git_inbox.py                    # or: --prs, --min-age 30, --json
 ```
 
 ---
@@ -332,6 +361,8 @@ git_accessories/
 ├── test_git_banner.py  # Layout self-check for git_banner.py (fake data)
 ├── git_followers.py # Follower tracker (new followers, unfollowers, fans)
 ├── test_git_followers.py  # Checks for git_followers.diff_snapshots
+├── git_inbox.py     # Open issues and PRs across your repos
+├── test_git_inbox.py  # Checks for git_inbox.simplify
 ├── banner.svg       # Generated stats card (updated by the workflow)
 ├── .github/
 │   └── workflows/
