@@ -395,7 +395,8 @@ git_accessories/
 ├── banner.svg       # Generated stats card (updated by the workflow)
 ├── .github/
 │   └── workflows/
-│       └── update-banner.yml  # Daily banner.svg regeneration
+│       ├── update-banner.yml  # Daily banner.svg regeneration
+│       └── tests.yml          # Runs test_*.py on every push and PR
 ├── .env             # Local secrets (gitignored)
 ├── .gitignore
 └── README.md
@@ -405,7 +406,7 @@ git_accessories/
 
 ## 🤝 Contributing
 
-Pull requests are welcome! If you have ideas for more GitHub utility scripts to add to this collection, feel free to open an issue or PR.
+Pull requests are welcome! Run the offline checks before opening one (`for t in test_*.py; do python "$t"; done`); the **Tests** workflow runs them on every push and PR. If you have ideas for more GitHub utility scripts to add to this collection, feel free to open an issue or PR.
 
 ---
 

@@ -1,0 +1,20 @@
+# Runs the offline self-checks (test_*.py) and a syntax check of every tool on each push and PR.
+# No secrets needed: the tests use fake data and never call the GitHub API.
+name: Tests
+
+on:
+  push:
+    paths-ignore: ["banner.svg"]  # skip the daily banner bot commits
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests python-dotenv
+      - run: python -m py_compile git_*.py
+      - run: for t in test_*.py; do echo "== $t"; python "$t"; done  # default shell is bash -e, so any failure fails the job
